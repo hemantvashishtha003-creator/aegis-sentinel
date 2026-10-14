@@ -1,0 +1,1033 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>AEGIS-SENTINEL | Advanced Device Security & Incident Response</title>
+  <meta name="description" content="Advanced device security and incident response platform for evaluating phishing links, collecting forensic evidence, MDM remote actions, and isolated cyber range testing.">
+  
+  <!-- Modern Typography from Google Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;600;700&family=Outfit:wght@400;500;600;700;800&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+  
+  <!-- CSS Stylesheets -->
+  <link rel="stylesheet" href="/css/main.css">
+  <link rel="stylesheet" href="/css/dashboard.css">
+  <link rel="stylesheet" href="/css/modal.css">
+</head>
+<body>
+
+  <!-- Top Header Bar -->
+  <header class="top-header">
+    <div class="brand-section">
+      <div class="brand-shield">
+        <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path>
+          <path d="M9 12l2 2 4-4"></path>
+        </svg>
+      </div>
+      <div>
+        <div class="brand-title">
+          AEGIS-SENTINEL
+          <span class="badge badge-corp" style="font-size:0.65rem;">v2.6 SEC-DEFENSE</span>
+        </div>
+        <div class="brand-subtitle">Advanced Device Security & Incident Response Suite</div>
+      </div>
+    </div>
+
+    <!-- Live Telemetry Status -->
+    <div class="telemetry-banner">
+      <div class="telemetry-item">
+        <span class="pulse-dot"></span>
+        <span>DEFENSE GRID: <strong>ACTIVE</strong></span>
+      </div>
+      <div class="telemetry-item">
+        <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2">
+          <rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect>
+          <path d="M7 11V7a5 5 0 0 1 10 0v4"></path>
+        </svg>
+        <span>VAULT: <strong>AES-256-GCM</strong></span>
+      </div>
+      <div class="telemetry-item">
+        <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2">
+          <circle cx="12" cy="12" r="10"></circle>
+          <line x1="2" y1="12" x2="22" y2="12"></line>
+          <path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"></path>
+        </svg>
+        <span>AUDIT: <strong>HMAC-SHA256 CHAIN</strong></span>
+      </div>
+
+      <!-- User Persona Switcher (RBAC) -->
+      <div class="user-persona-selector">
+        <span class="persona-label">Operator:</span>
+        <select id="persona-select" class="persona-select">
+          <!-- Populated by JavaScript -->
+        </select>
+      </div>
+    </div>
+  </header>
+
+  <!-- Navigation Bar -->
+  <nav class="nav-bar">
+    <button class="nav-tab active" data-view="dashboard">
+      <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <rect x="3" y="3" width="7" height="7"></rect>
+        <rect x="14" y="3" width="7" height="7"></rect>
+        <rect x="14" y="14" width="7" height="7"></rect>
+        <rect x="3" y="14" width="7" height="7"></rect>
+      </svg>
+      SOC Command Center
+    </button>
+    <button class="nav-tab" data-view="assessment">
+      <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <circle cx="11" cy="11" r="8"></circle>
+        <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+      </svg>
+      URL Access Assessment
+    </button>
+    <button class="nav-tab" data-view="evidence">
+      <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"></path>
+        <polyline points="3.27 6.96 12 12.01 20.73 6.96"></polyline>
+        <line x1="12" y1="22.08" x2="12" y2="12"></line>
+      </svg>
+      Forensic Evidence Vault
+    </button>
+    <button class="nav-tab" data-view="mdm">
+      <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <rect x="5" y="2" width="14" height="20" rx="2" ry="2"></rect>
+        <line x1="12" y1="18" x2="12.01" y2="18"></line>
+      </svg>
+      MDM Fleet & Remote Response
+    </button>
+    <button class="nav-tab" data-view="lab">
+      <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M10 2v7.31"></path>
+        <path d="M14 9.3V2"></path>
+        <path d="M8.5 2h7"></path>
+        <path d="M14 9.3a6.5 6.5 0 1 1-4 0"></path>
+        <path d="M5.52 16h12.96"></path>
+      </svg>
+      Isolated Cyber Range Lab
+    </button>
+    <button class="nav-tab" data-view="audit">
+      <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+        <polyline points="14 2 14 8 20 8"></polyline>
+        <line x1="16" y1="13" x2="8" y2="13"></line>
+        <line x1="16" y1="17" x2="8" y2="17"></line>
+        <polyline points="10 9 9 9 8 9"></polyline>
+      </svg>
+      Tamper-Evident Audit Trail
+    </button>
+  </nav>
+
+  <!-- Main Application Body -->
+  <main class="main-content">
+
+    <!-- ============================================================== -->
+    <!-- VIEW 1: SOC COMMAND CENTER (DASHBOARD)                          -->
+    <!-- ============================================================== -->
+    <section id="view-dashboard" class="view-section active">
+      <!-- High-level Telemetry Cards -->
+      <div class="metrics-grid">
+        <div class="metric-card cyan">
+          <div class="metric-info">
+            <div class="metric-label">Managed Endpoints</div>
+            <div id="stat-total-devices" class="metric-value">--</div>
+            <div class="metric-subtext">Corporate & Lab Enrolled</div>
+          </div>
+          <div class="metric-icon">
+            <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <rect x="2" y="3" width="20" height="14" rx="2" ry="2"></rect>
+              <line x1="8" y1="21" x2="16" y2="21"></line>
+              <line x1="12" y1="17" x2="12" y2="21"></line>
+            </svg>
+          </div>
+        </div>
+
+        <div class="metric-card amber">
+          <div class="metric-info">
+            <div class="metric-label">Active Containment</div>
+            <div id="stat-quarantined" class="metric-value">--</div>
+            <div class="metric-subtext">Quarantined / Locked Devices</div>
+          </div>
+          <div class="metric-icon">
+            <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect>
+              <path d="M7 11V7a5 5 0 0 1 10 0v4"></path>
+            </svg>
+          </div>
+        </div>
+
+        <div class="metric-card crimson">
+          <div class="metric-info">
+            <div class="metric-label">URL Assessments</div>
+            <div id="stat-assessments" class="metric-value">--</div>
+            <div class="metric-subtext">Phishing & Boundary Scans</div>
+          </div>
+          <div class="metric-icon">
+            <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <circle cx="12" cy="12" r="10"></circle>
+              <line x1="12" y1="8" x2="12" y2="12"></line>
+              <line x1="12" y1="16" x2="12.01" y2="16"></line>
+            </svg>
+          </div>
+        </div>
+
+        <div class="metric-card purple">
+          <div class="metric-info">
+            <div class="metric-label">Encrypted Vault Items</div>
+            <div id="stat-vault-items" class="metric-value">--</div>
+            <div class="metric-subtext">AES-256-GCM Forensic Records</div>
+          </div>
+          <div class="metric-icon">
+            <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"></path>
+            </svg>
+          </div>
+        </div>
+
+        <div class="metric-card green">
+          <div class="metric-info">
+            <div class="metric-label">Audit Log Blocks</div>
+            <div id="stat-audit-count" class="metric-value">--</div>
+            <div class="metric-subtext">Tamper-Proof Chained Events</div>
+          </div>
+          <div class="metric-icon">
+            <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path>
+            </svg>
+          </div>
+        </div>
+      </div>
+
+      <!-- Quick Action Grid -->
+      <div class="grid-2col">
+        <!-- Managed Fleet Overview -->
+        <div class="cyber-panel">
+          <div class="panel-header">
+            <div class="panel-title">
+              <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <rect x="2" y="3" width="20" height="14" rx="2" ry="2"></rect>
+                <line x1="8" y1="21" x2="16" y2="21"></line>
+                <line x1="12" y1="17" x2="12" y2="21"></line>
+              </svg>
+              Managed Endpoints Fleet
+            </div>
+            <button class="btn btn-cyan" onclick="switchView('mdm')">View All Fleet</button>
+          </div>
+          <div class="cyber-table-container">
+            <table class="cyber-table">
+              <thead>
+                <tr>
+                  <th>Device & Serial</th>
+                  <th>Classification</th>
+                  <th>Platform</th>
+                  <th>Status</th>
+                  <th>Last Seen</th>
+                </tr>
+              </thead>
+              <tbody id="dashboard-devices-tbody">
+                <!-- Populated by JS -->
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        <!-- Recent URL Assessments -->
+        <div class="cyber-panel">
+          <div class="panel-header">
+            <div class="panel-title">
+              <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <circle cx="11" cy="11" r="8"></circle>
+                <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+              </svg>
+              Recent URL & Phishing Assessments
+            </div>
+            <button class="btn btn-cyan" onclick="switchView('assessment')">New Assessment</button>
+          </div>
+          <div id="dashboard-assessments-list" class="reasons-list">
+            <!-- Populated by JS -->
+          </div>
+        </div>
+      </div>
+    </section>
+
+
+    <!-- ============================================================== -->
+    <!-- VIEW 2: DEVICE ACCESS ASSESSMENT (URL SCANNER & BOUNDARIES)    -->
+    <!-- ============================================================== -->
+    <section id="view-assessment" class="view-section">
+      <div class="cyber-panel" style="margin-bottom: 2rem;">
+        <div class="panel-header">
+          <div class="panel-title">
+            <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <circle cx="11" cy="11" r="8"></circle>
+              <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+            </svg>
+            Lawful URL Security & Device Boundary Assessment
+          </div>
+          <span class="badge badge-corp">RFC 3986 & W3C BOUNDARIES</span>
+        </div>
+
+        <p style="font-size:0.85rem; color:var(--text-secondary); margin-bottom:1.25rem; line-height:1.5;">
+          Lawfully determine what telemetry is publicly accessible from a reported suspicious link without unauthorized interaction. Analyze browser security boundaries (Same-Origin Policy, Web Permissions, File System Access API), OS sandbox isolation, and verify that navigating to a URL grants zero access to private host files or device-management controls.
+        </p>
+
+        <!-- Search Bar -->
+        <div class="scanner-search-box">
+          <input type="text" id="input-scan-url" class="scanner-input" placeholder="Enter reported URL (e.g., https://login.microsoftonline.com.phish-auth-test.dev/verify?token=9821)" value="https://login.microsoftonline.com.phish-auth-test.dev/verify?token=9821">
+          <button id="btn-run-scan" class="btn btn-primary">
+            <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <circle cx="11" cy="11" r="8"></circle>
+              <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+            </svg>
+            Assess Boundaries & Public Intel
+          </button>
+        </div>
+
+        <!-- Quick Sample Chips -->
+        <div class="url-quick-samples">
+          <span style="font-size:0.75rem; color:var(--text-muted); font-weight:600;">Test Phishing Samples:</span>
+          <button class="sample-chip" data-url="https://login.microsoftonline.com.phish-auth-test.dev/verify?token=9821">
+            Microsoft 365 Credential Harvest Clone
+          </button>
+          <button class="sample-chip" data-url="http://192.168.1.105/fake-update/install.mobileconfig">
+            Raw IP Rogue MDM Profile Prompt
+          </button>
+          <button class="sample-chip" data-url="https://okta-internal-verify.xyz/login?session=active_probe">
+            Okta Impersonation (.xyz High Risk TLD)
+          </button>
+          <button class="sample-chip" data-url="https://www.google.com/search?q=cybersecurity">
+            Benign Reference Link
+          </button>
+        </div>
+
+        <!-- Assessment Results Display -->
+        <div id="assessment-result-container" style="display:none; margin-top:1.5rem;">
+          
+          <!-- Explicit Security Boundary Verdict Box -->
+          <div class="boundary-verdict-box">
+            <div class="verdict-shield-icon">
+              <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path>
+                <path d="M9 12l2 2 4-4"></path>
+              </svg>
+            </div>
+            <div>
+              <div class="verdict-title">
+                Lawful Device Access Boundary Verdict
+                <span id="res-verdict-badge" class="badge badge-malicious" style="margin-left:0.5rem;">--</span>
+              </div>
+              <div id="res-verdict-statement" class="verdict-text">
+                --
+              </div>
+              <div style="margin-top:0.5rem; font-size:0.75rem; color:var(--text-secondary);">
+                Target: <span id="res-domain" class="code-inline">--</span> &bull; Full URL: <span id="res-url" class="code-inline">--</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Browser & OS Boundary Cards Matrix -->
+          <h3 style="font-size:1rem; color:#fff; margin-bottom:1rem; display:flex; align-items:center; gap:0.5rem;">
+            <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="var(--accent-cyan)" stroke-width="2">
+              <rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect>
+              <line x1="3" y1="9" x2="21" y2="9"></line>
+              <line x1="9" y1="21" x2="9" y2="9"></line>
+            </svg>
+            Core Security Boundary Evaluations
+          </h3>
+
+          <div class="boundary-matrix">
+            <div class="boundary-card">
+              <div class="boundary-card-header">
+                <div class="boundary-name">Same-Origin Policy (SOP)</div>
+                <span class="boundary-status-pill pill-secure">ENFORCED</span>
+              </div>
+              <div id="res-sop-desc" class="boundary-desc">--</div>
+              <span class="badge badge-secure">Cross-Origin DOM / Storage Blocked</span>
+            </div>
+
+            <div class="boundary-card">
+              <div class="boundary-card-header">
+                <div class="boundary-name">Cookie & Storage Partitioning</div>
+                <span class="boundary-status-pill pill-secure">ISOLATED</span>
+              </div>
+              <div id="res-cookie-desc" class="boundary-desc">--</div>
+              <span class="badge badge-secure">HttpOnly & SameSite Guarded</span>
+            </div>
+
+            <div class="boundary-card">
+              <div class="boundary-card-header">
+                <div class="boundary-name">Web Permissions API</div>
+                <span class="boundary-status-pill pill-prompt">EXPLICIT PROMPT</span>
+              </div>
+              <div id="res-perm-desc" class="boundary-desc">--</div>
+              <span class="badge badge-quarantined">Silent Camera/Mic Access Denied</span>
+            </div>
+
+            <div class="boundary-card">
+              <div class="boundary-card-header">
+                <div class="boundary-name">File System Access API</div>
+                <span class="boundary-status-pill pill-blocked">ZERO SILENT ACCESS</span>
+              </div>
+              <div id="res-fs-desc" class="boundary-desc">--</div>
+              <span class="badge badge-secure">showOpenFilePicker Mandates User Gesture</span>
+            </div>
+
+            <div class="boundary-card">
+              <div class="boundary-card-header">
+                <div class="boundary-name">OS Renderer Sandboxing</div>
+                <span class="boundary-status-pill pill-secure">RESTRICTED TOKEN</span>
+              </div>
+              <div id="res-os-sandbox-desc" class="boundary-desc">--</div>
+              <span class="badge badge-corp">Unprivileged Worker Process</span>
+            </div>
+
+            <div class="boundary-card">
+              <div class="boundary-card-header">
+                <div class="boundary-name">MDM Protocol Isolation</div>
+                <span class="boundary-status-pill pill-blocked">INACCESSIBLE TO WEB</span>
+              </div>
+              <div id="res-mdm-desc" class="boundary-desc">--</div>
+              <span class="badge badge-secure">MDM Requires APNs/WNS Push Certificate</span>
+            </div>
+          </div>
+
+          <!-- Lawful Public Intelligence & Threat Heuristics -->
+          <div class="grid-2col" style="margin-top:1.5rem;">
+            <!-- Lawful Public Data -->
+            <div class="cyber-panel">
+              <div class="panel-header">
+                <div class="panel-title">Lawfully Acquired Public Metadata</div>
+              </div>
+              <div class="crypto-details-grid">
+                <div class="crypto-row">
+                  <span class="crypto-label">Resolved DNS A Records:</span>
+                  <span id="res-dns-ips" class="crypto-val">--</span>
+                </div>
+                <div class="crypto-row">
+                  <span class="crypto-label">TLS Protocol & Cipher:</span>
+                  <span id="res-tls-proto" class="crypto-val">--</span>
+                </div>
+                <div class="crypto-row">
+                  <span class="crypto-label">Certificate Authority:</span>
+                  <span id="res-tls-issuer" class="crypto-val">--</span>
+                </div>
+                <div class="crypto-row">
+                  <span class="crypto-label">Content Security Policy:</span>
+                  <span id="res-hdr-csp" class="crypto-val">--</span>
+                </div>
+                <div class="crypto-row">
+                  <span class="crypto-label">HSTS Header:</span>
+                  <span id="res-hdr-hsts" class="crypto-val">--</span>
+                </div>
+                <div class="crypto-row">
+                  <span class="crypto-label">X-Frame-Options:</span>
+                  <span id="res-hdr-xframe" class="crypto-val">--</span>
+                </div>
+              </div>
+            </div>
+
+            <!-- Phishing Indicators -->
+            <div class="cyber-panel">
+              <div class="panel-header">
+                <div class="panel-title">Phishing & Threat Indicators</div>
+              </div>
+              <div id="res-reasons-list" class="reasons-list">
+                <!-- Populated by JS -->
+              </div>
+            </div>
+          </div>
+
+        </div>
+      </div>
+
+      <!-- Historical Assessments Table -->
+      <div class="cyber-panel">
+        <div class="panel-header">
+          <div class="panel-title">Assessment History & Lawful URL Records</div>
+        </div>
+        <div class="cyber-table-container">
+          <table class="cyber-table">
+            <thead>
+              <tr>
+                <th>Target Domain / URL</th>
+                <th>Threat Verdict</th>
+                <th>Investigator</th>
+                <th>Timestamp</th>
+                <th>Actions</th>
+              </tr>
+            </thead>
+            <tbody id="assessments-history-tbody">
+              <!-- Populated by JS -->
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </section>
+
+
+    <!-- ============================================================== -->
+    <!-- VIEW 3: FORENSIC EVIDENCE VAULT (AUTHORIZED DATA COLLECTION)   -->
+    <!-- ============================================================== -->
+    <section id="view-evidence" class="view-section">
+      <div class="cyber-panel" style="margin-bottom: 2rem;">
+        <div class="panel-header">
+          <div class="panel-title">
+            <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"></path>
+            </svg>
+            Authorized Evidence Vault & Chain of Custody
+          </div>
+          <div style="display:flex; gap:0.5rem;">
+            <button id="btn-purge-evidence" class="btn btn-outline" style="font-size:0.75rem;">
+              Purge Expired Records
+            </button>
+            <button class="btn btn-primary" onclick="openAcquisitionModal()">
+              <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <line x1="12" y1="5" x2="12" y2="19"></line>
+                <line x1="5" y1="12" x2="19" y2="12"></line>
+              </svg>
+              Acquire Authorized Evidence
+            </button>
+          </div>
+        </div>
+
+        <p style="font-size:0.85rem; color:var(--text-secondary); margin-bottom:1.5rem; line-height:1.5;">
+          All forensic indicators (security event logs, authentication telemetry, DNS caches, memory triage artifacts) acquired from authorized endpoints are encrypted with <strong>AES-256-GCM</strong>. Every artifact carries a pre-encryption <strong>SHA-256 checksum</strong> to prove non-tampering throughout the legal chain of custody. Decryption is strictly gated by Role-Based Access Control (RBAC).
+        </p>
+
+        <!-- Evidence Records Table -->
+        <div class="cyber-table-container">
+          <table class="cyber-table">
+            <thead>
+              <tr>
+                <th>Artifact Title & ID</th>
+                <th>Type</th>
+                <th>SHA-256 Checksum (Pre-Encrypt)</th>
+                <th>Size</th>
+                <th>Legal Hold</th>
+                <th>Retention Expiry</th>
+                <th>Actions</th>
+              </tr>
+            </thead>
+            <tbody id="evidence-vault-tbody">
+              <!-- Populated by JS -->
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </section>
+
+
+    <!-- ============================================================== -->
+    <!-- VIEW 4: MDM FLEET & REMOTE INCIDENT RESPONSE                   -->
+    <!-- ============================================================== -->
+    <section id="view-mdm" class="view-section">
+      <div class="cyber-panel" style="margin-bottom: 2rem;">
+        <div class="panel-header">
+          <div class="panel-title">
+            <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <rect x="5" y="2" width="14" height="20" rx="2" ry="2"></rect>
+              <line x1="12" y1="18" x2="12.01" y2="18"></line>
+            </svg>
+            Enrolled Endpoint Fleet & MDM Response
+          </div>
+          <button class="btn btn-primary" onclick="openEnrollmentModal()">
+            <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <line x1="12" y1="5" x2="12" y2="19"></line>
+              <line x1="5" y1="12" x2="19" y2="12"></line>
+            </svg>
+            Enroll New Endpoint
+          </button>
+        </div>
+
+        <div style="background:rgba(0,229,255,0.04); border:1px solid var(--border-cyan); border-radius:var(--radius-md); padding:0.85rem 1.25rem; margin-bottom:1.25rem; font-size:0.82rem; color:#94a3b8; display:flex; gap:0.75rem; align-items:center;">
+          <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="var(--accent-cyan)" stroke-width="2">
+            <circle cx="12" cy="12" r="10"></circle>
+            <line x1="12" y1="16" x2="12" y2="12"></line>
+            <line x1="12" y1="8" x2="12.01" y2="8"></line>
+          </svg>
+          <div>
+            <strong>Strict Authorization Safeguards:</strong> Live corporate endpoints strictly require dual-operator verification before destructive factory reset commands can be dispatched. Simulated test lab endpoints execute inside an isolated range.
+          </div>
+        </div>
+
+        <div class="cyber-table-container">
+          <table class="cyber-table">
+            <thead>
+              <tr>
+                <th>Device Name & Serial</th>
+                <th>Classification</th>
+                <th>Platform & OS</th>
+                <th>Enrollment Status</th>
+                <th>Assigned User & IP</th>
+                <th>Incident Response Actions</th>
+              </tr>
+            </thead>
+            <tbody id="mdm-devices-tbody">
+              <!-- Populated by JS -->
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- MDM Command History -->
+      <div class="cyber-panel">
+        <div class="panel-header">
+          <div class="panel-title">MDM Response Command Audit Trail</div>
+        </div>
+        <div class="cyber-table-container">
+          <table class="cyber-table">
+            <thead>
+              <tr>
+                <th>Command ID</th>
+                <th>Command Type</th>
+                <th>Operator</th>
+                <th>Status</th>
+                <th>Cryptographic HMAC Signature</th>
+                <th>Executed At</th>
+              </tr>
+            </thead>
+            <tbody id="mdm-commands-tbody">
+              <!-- Populated by JS -->
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </section>
+
+
+    <!-- ============================================================== -->
+    <!-- VIEW 5: ISOLATED CYBER RANGE TESTING LAB                       -->
+    <!-- ============================================================== -->
+    <section id="view-lab" class="view-section">
+      <div class="cyber-panel" style="margin-bottom: 2rem;">
+        <div class="panel-header">
+          <div class="panel-title">
+            <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M10 2v7.31"></path>
+              <path d="M14 9.3V2"></path>
+              <path d="M8.5 2h7"></path>
+              <path d="M14 9.3a6.5 6.5 0 1 1-4 0"></path>
+              <path d="M5.52 16h12.96"></path>
+            </svg>
+            Isolated Security Testing Lab & Synthetic Range
+          </div>
+          <span class="badge badge-lab">SYNTHETIC USER DATA ONLY</span>
+        </div>
+
+        <p style="font-size:0.85rem; color:var(--text-secondary); margin-bottom:1.5rem; line-height:1.5;">
+          Controlled laboratory environment using dedicated synthetic test devices. Test browser sandbox protections, permission boundaries, and phishing incident response workflows with synthetic user data. No private user telemetry is collected from external devices, and simulations are isolated to lab devices.
+        </p>
+
+        <!-- Scenarios Grid -->
+        <div id="lab-scenarios-container" class="scenarios-grid">
+          <!-- Populated by JS -->
+        </div>
+
+        <!-- Live Simulation Output Box -->
+        <div id="lab-output-container" class="cyber-panel" style="display:none; margin-top:2rem; border-color:var(--border-cyan);">
+          <div class="panel-header">
+            <div class="panel-title">
+              <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <polyline points="4 17 10 11 4 5"></polyline>
+                <line x1="12" y1="19" x2="20" y2="19"></line>
+              </svg>
+              Isolated Simulation Execution Report
+            </div>
+            <span class="badge badge-lab">LABORATORY VERIFIED</span>
+          </div>
+
+          <div class="crypto-details-grid" style="margin-bottom:1rem;">
+            <div class="crypto-row">
+              <span class="crypto-label">Execution ID:</span>
+              <span id="lab-exec-id" class="crypto-val">--</span>
+            </div>
+            <div class="crypto-row">
+              <span class="crypto-label">Target Lab Endpoint:</span>
+              <span id="lab-exec-device" class="crypto-val">--</span>
+            </div>
+            <div class="crypto-row">
+              <span class="crypto-label">Scenario Name:</span>
+              <span id="lab-exec-scenario" class="crypto-val">--</span>
+            </div>
+            <div class="crypto-row">
+              <span class="crypto-label">Simulation Summary:</span>
+              <span id="lab-exec-summary" class="crypto-val" style="color:#6ee7b7;">--</span>
+            </div>
+          </div>
+
+          <h4 style="font-size:0.85rem; color:#fff; margin-bottom:0.75rem; text-transform:uppercase;">
+            Evaluated Security Boundaries:
+          </h4>
+          <div id="lab-evaluations-list">
+            <!-- Populated by JS -->
+          </div>
+        </div>
+      </div>
+    </section>
+
+
+    <!-- ============================================================== -->
+    <!-- VIEW 6: TAMPER-EVIDENT AUDIT TRAIL                             -->
+    <!-- ============================================================== -->
+    <section id="view-audit" class="view-section">
+      <div class="cyber-panel">
+        <div class="panel-header">
+          <div class="panel-title">
+            <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+              <polyline points="14 2 14 8 20 8"></polyline>
+            </svg>
+            Cryptographic Tamper-Evident Audit Trail
+          </div>
+          <div style="display:flex; align-items:center; gap:0.75rem;">
+            <span id="audit-integrity-badge" class="badge badge-secure">VALID CHAIN</span>
+            <button id="btn-verify-chain" class="btn btn-primary">
+              <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path>
+              </svg>
+              Verify SHA-256 Chain Integrity
+            </button>
+          </div>
+        </div>
+
+        <p style="font-size:0.85rem; color:var(--text-secondary); margin-bottom:1.5rem; line-height:1.5;">
+          Every incident response action (URL scan, forensic evidence collection, quarantine, remote lock, and destructive factory reset) is appended to an immutable audit log. Each entry computes a SHA-256 hash that links to the previous block hash, creating a blockchain-style tamper-evident ledger.
+        </p>
+
+        <div class="cyber-table-container">
+          <table class="cyber-table">
+            <thead>
+              <tr>
+                <th>Log ID</th>
+                <th>Event Type</th>
+                <th>Actor & Role</th>
+                <th>Action</th>
+                <th>Cryptographic Tamper Hash</th>
+                <th>Timestamp</th>
+                <th>Action</th>
+              </tr>
+            </thead>
+            <tbody id="audit-logs-tbody">
+              <!-- Populated by JS -->
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </section>
+
+  </main>
+
+  <!-- ============================================================== -->
+  <!-- MODALS                                                         -->
+  <!-- ============================================================== -->
+
+  <!-- 1. DUAL-AUTH DESTRUCTIVE FACTORY RESET MODAL -->
+  <div id="modal-factory-reset" class="modal-backdrop">
+    <div class="modal-dialog danger-dialog">
+      <div class="modal-header">
+        <div class="modal-title danger-title">
+          <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"></path>
+            <line x1="12" y1="9" x2="12" y2="13"></line>
+            <line x1="12" y1="17" x2="12.01" y2="17"></line>
+          </svg>
+          Destructive MDM Factory Reset
+        </div>
+        <button class="modal-close-btn">&times;</button>
+      </div>
+
+      <div class="modal-body">
+        <div class="destructive-warning-box">
+          <div class="warning-icon">
+            <svg viewBox="0 0 24 24" fill="none" stroke-width="2">
+              <circle cx="12" cy="12" r="10"></circle>
+              <line x1="12" y1="8" x2="12" y2="12"></line>
+              <line x1="12" y1="16" x2="12.01" y2="16"></line>
+            </svg>
+          </div>
+          <div class="warning-content">
+            <h4>Irreversible Hardware Erasure Warning</h4>
+            <p>
+              This command dispatches an MDM cryptographic wipe instruction. All partitions, encryption keys, and operating system data on the target hardware will be permanently erased.
+            </p>
+          </div>
+        </div>
+
+        <div style="background:rgba(0,0,0,0.3); padding:0.85rem; border-radius:var(--radius-md); font-size:0.82rem;">
+          <div>Target Endpoint: <strong id="reset-target-device-name" style="color:#fff;">--</strong></div>
+          <div style="margin-top:0.35rem;">Classification: <span id="reset-target-badge" class="badge badge-corp">--</span></div>
+          <div style="margin-top:0.35rem;">Initiating Operator: <span id="reset-operator-display" class="code-inline">--</span></div>
+        </div>
+
+        <!-- Step 1: Justification -->
+        <div id="reset-step-1">
+          <div class="form-group">
+            <label class="form-label">Operational Incident Reason (Minimum 10 chars):</label>
+            <textarea id="reset-reason-input" class="form-textarea" placeholder="Describe the verified compromise justifying full hardware erasure (e.g., Executive endpoint compromised via credential harvesting phishing attack, remote persistence detected)."></textarea>
+          </div>
+          <div style="margin-top:1.25rem; display:flex; justify-content:flex-end; gap:0.75rem;">
+            <button class="btn btn-outline btn-modal-cancel">Cancel</button>
+            <button id="btn-initiate-reset-step" class="btn btn-danger">
+              Generate Confirmation Code & Proceed
+            </button>
+          </div>
+        </div>
+
+        <!-- Step 2: Code Confirmation & Dual Approver -->
+        <div id="reset-step-2" style="display:none;">
+          <div class="confirmation-code-box">
+            <div style="font-size:0.75rem; text-transform:uppercase; color:var(--text-secondary);">One-Time Cryptographic Confirmation Code</div>
+            <div id="reset-generated-code" class="code-display">CONFIRM-RESET-XXXX-YYYY</div>
+            <div style="font-size:0.75rem; color:var(--text-muted);">Copy or type this exact code below to verify deliberate intent.</div>
+          </div>
+
+          <div class="form-group" style="margin-top:1rem;">
+            <label class="form-label">Type Confirmation Code to Authorize:</label>
+            <input type="text" id="reset-input-code" class="form-input" placeholder="Type exact code here...">
+          </div>
+
+          <div id="reset-dual-approver-group" class="form-group" style="margin-top:1rem;">
+            <label class="form-label">Dual Operator Approval (Mandatory for Live Corporate Endpoints):</label>
+            <select id="reset-dual-approver-select" class="form-select">
+              <!-- Populated by JS with distinct operators -->
+            </select>
+          </div>
+
+          <div style="margin-top:1.25rem; display:flex; justify-content:flex-end; gap:0.75rem;">
+            <button class="btn btn-outline btn-modal-cancel">Abort</button>
+            <button id="btn-execute-confirmed-reset" class="btn btn-danger">
+              Authorize & Dispatch Destructive Wipe
+            </button>
+          </div>
+        </div>
+
+        <!-- Step 3: Success Execution Feedback -->
+        <div id="reset-step-3-result" style="display:none;">
+          <div style="text-align:center; padding:1.5rem 0;">
+            <div style="width:50px; height:50px; background:var(--accent-green-dim); border:1px solid var(--accent-green); border-radius:50%; display:inline-flex; align-items:center; justify-content:center; margin-bottom:1rem;">
+              <svg viewBox="0 0 24 24" width="28" height="28" fill="none" stroke="var(--accent-green)" stroke-width="2">
+                <polyline points="20 6 9 17 4 12"></polyline>
+              </svg>
+            </div>
+            <h3 style="color:#fff; font-size:1.1rem; margin-bottom:0.5rem;">Command Dispatched & Acknowledged</h3>
+            <p id="reset-disclaimer-text" style="font-size:0.85rem; color:var(--text-secondary); max-width:500px; margin:0 auto; line-height:1.45;">--</p>
+            <div style="margin-top:1rem; font-size:0.75rem; color:var(--text-muted);">
+              HMAC Signature: <span id="reset-signature-text" class="code-inline" style="word-break:break-all;">--</span>
+            </div>
+          </div>
+          <div style="display:flex; justify-content:flex-end;">
+            <button class="btn btn-primary btn-modal-cancel">Done</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 2. EVIDENCE DETAIL & DECRYPT MODAL -->
+  <div id="modal-evidence-detail" class="modal-backdrop">
+    <div class="modal-dialog">
+      <div class="modal-header">
+        <div class="modal-title">
+          <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="var(--accent-cyan)" stroke-width="2">
+            <path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"></path>
+          </svg>
+          <span id="evd-modal-title">Evidence Artifact Details</span>
+        </div>
+        <button class="modal-close-btn">&times;</button>
+      </div>
+      <div class="modal-body">
+        <div class="crypto-details-grid">
+          <div class="crypto-row">
+            <span class="crypto-label">Record ID:</span>
+            <span id="evd-modal-id" class="crypto-val">--</span>
+          </div>
+          <div class="crypto-row">
+            <span class="crypto-label">SHA-256 Checksum:</span>
+            <span id="evd-modal-checksum" class="crypto-val">--</span>
+          </div>
+          <div class="crypto-row">
+            <span class="crypto-label">Integrity Status:</span>
+            <span id="evd-integrity-pill" class="badge badge-secure">VERIFIED</span>
+          </div>
+          <div class="crypto-row">
+            <span class="crypto-label">Size:</span>
+            <span id="evd-modal-size" class="crypto-val">--</span>
+          </div>
+          <div class="crypto-row">
+            <span class="crypto-label">Collected By:</span>
+            <span id="evd-modal-collector" class="crypto-val">--</span>
+          </div>
+          <div class="crypto-row">
+            <span class="crypto-label">Expires At:</span>
+            <span id="evd-modal-expires" class="crypto-val">--</span>
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">Decrypted Forensic Payload (RBAC Verified):</label>
+          <div id="evd-modal-content" class="raw-json-viewer">--</div>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button class="btn btn-outline btn-modal-cancel">Close</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- 3. DEVICE ENROLLMENT MODAL -->
+  <div id="modal-enroll-device" class="modal-backdrop">
+    <div class="modal-dialog">
+      <div class="modal-header">
+        <div class="modal-title">
+          <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="var(--accent-cyan)" stroke-width="2">
+            <rect x="5" y="2" width="14" height="20" rx="2" ry="2"></rect>
+          </svg>
+          Enroll Authorized Endpoint
+        </div>
+        <button class="modal-close-btn">&times;</button>
+      </div>
+      <form id="form-enroll-device">
+        <div class="modal-body">
+          <div class="form-group">
+            <label class="form-label">Device Hostname / Name:</label>
+            <input type="text" id="enroll-device-name" class="form-input" required placeholder="e.g. LAB-LINUX-SANDBOX-05">
+          </div>
+          <div class="form-group">
+            <label class="form-label">Hardware Serial Number:</label>
+            <input type="text" id="enroll-serial" class="form-input" required placeholder="e.g. SN-LAB-LIN-8890">
+          </div>
+          <div class="grid-2col" style="margin-bottom:0;">
+            <div class="form-group">
+              <label class="form-label">Platform:</label>
+              <select id="enroll-platform" class="form-select">
+                <option value="macos">macOS (Apple Silicon)</option>
+                <option value="windows">Windows 11 Enterprise</option>
+                <option value="android">Android Enterprise</option>
+                <option value="ios">iOS Supervised</option>
+                <option value="linux">Linux (Ubuntu/Debian)</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label class="form-label">Classification:</label>
+              <select id="enroll-is-lab" class="form-select">
+                <option value="1">Simulated Test Device (Lab Range)</option>
+                <option value="0">Verified Live Corporate Device</option>
+              </select>
+            </div>
+          </div>
+          <div class="form-group">
+            <label class="form-label">OS Version:</label>
+            <input type="text" id="enroll-os" class="form-input" placeholder="e.g. macOS 15.0.1 / Windows 11 23H2">
+          </div>
+          <div class="form-group">
+            <label class="form-label">Assigned User / Synthetic Profile:</label>
+            <input type="text" id="enroll-user" class="form-input" placeholder="e.g. lab.tester@synthetic-corp.test">
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-outline btn-modal-cancel">Cancel</button>
+          <button type="submit" class="btn btn-primary">Enroll & Issue MDM Certificate</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- 4. ACQUIRE EVIDENCE MODAL -->
+  <div id="modal-acquire-evidence" class="modal-backdrop">
+    <div class="modal-dialog">
+      <div class="modal-header">
+        <div class="modal-title">
+          <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="var(--accent-cyan)" stroke-width="2">
+            <path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"></path>
+          </svg>
+          Acquire Authorized Forensic Evidence
+        </div>
+        <button class="modal-close-btn">&times;</button>
+      </div>
+      <form id="form-acquire-evidence">
+        <div class="modal-body">
+          <div class="form-group">
+            <label class="form-label">Select Authorized Target Endpoint:</label>
+            <select id="acq-device-select" class="form-select">
+              <!-- Populated by JS -->
+            </select>
+          </div>
+          <div class="grid-2col" style="margin-bottom:0;">
+            <div class="form-group">
+              <label class="form-label">Evidence Artifact Type:</label>
+              <select id="acq-evidence-type" class="form-select">
+                <option value="BROWSER_LOG">Browser History & SafeBrowsing Telemetry</option>
+                <option value="AUTH_FAILURES">Authentication Failures (Event 4625 / PAM)</option>
+                <option value="DNS_CACHE">Active DNS Client Cache</option>
+                <option value="SUSPICIOUS_ARTIFACT">Process Tree & Network Sockets Triage</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label class="form-label">Incident Case ID:</label>
+              <input type="text" id="acq-incident-id" class="form-input" value="INC-2026-PHISH-01" required>
+            </div>
+          </div>
+          <div class="form-group">
+            <label class="form-label">Investigator Operational Notes:</label>
+            <textarea id="acq-notes" class="form-textarea" placeholder="Note indicators, phishing email subject, or triage context."></textarea>
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-outline btn-modal-cancel">Cancel</button>
+          <button type="submit" class="btn btn-primary">Acquire, Encrypt & Seal in Vault</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- 5. AUDIT DETAIL MODAL -->
+  <div id="modal-audit-detail" class="modal-backdrop">
+    <div class="modal-dialog">
+      <div class="modal-header">
+        <div class="modal-title">Audit Block Details</div>
+        <button class="modal-close-btn">&times;</button>
+      </div>
+      <div class="modal-body">
+        <div class="crypto-details-grid">
+          <div class="crypto-row">
+            <span class="crypto-label">Block ID:</span>
+            <span id="audit-detail-id" class="crypto-val">--</span>
+          </div>
+          <div class="crypto-row">
+            <span class="crypto-label">Event:</span>
+            <span id="audit-detail-event" class="crypto-val">--</span>
+          </div>
+          <div class="crypto-row">
+            <span class="crypto-label">Actor & Role:</span>
+            <span id="audit-detail-actor" class="crypto-val">--</span>
+          </div>
+          <div class="crypto-row">
+            <span class="crypto-label">Tamper Hash:</span>
+            <span id="audit-detail-hash" class="crypto-val">--</span>
+          </div>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Block Payload Data:</label>
+          <div id="audit-detail-json" class="raw-json-viewer">--</div>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button class="btn btn-outline btn-modal-cancel">Close</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Toast Container -->
+  <div id="toast-container"></div>
+
+  <!-- Core Scripts -->
+  <script src="/js/api.js"></script>
+  <script src="/js/app.js"></script>
+</body>
+</html>

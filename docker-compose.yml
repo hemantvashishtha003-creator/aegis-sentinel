@@ -1,0 +1,51 @@
+services:
+  aegis-app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: aegis-sentinel-app
+    restart: unless-stopped
+    environment:
+      - NODE_ENV=production
+      - PORT=3000
+      - HOST=0.0.0.0
+      - DB_PATH=/app/data/security_sentinel.sqlite
+      - MASTER_ENCRYPTION_KEY=${MASTER_ENCRYPTION_KEY:-ae92f38d17b4c6e9821a4f5c9e2b8d7a1f4c6e8b2a3d5f7e9c1b3a5d7e9f1a3c}
+      - HMAC_SECRET=${HMAC_SECRET:-sentinel-mdm-tamper-proof-hmac-secret-key-2026}
+      - DEFAULT_RETENTION_DAYS=${DEFAULT_RETENTION_DAYS:-90}
+      - ALLOW_SIMULATED_DESTRUCTIVE=true
+    volumes:
+      - aegis-data:/app/data
+    networks:
+      - aegis-net
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:3000/api/stats/dashboard-stats"]
+      interval: 20s
+      timeout: 5s
+      retries: 3
+      start_period: 10s
+
+  nginx-proxy:
+    image: nginx:alpine
+    container_name: aegis-sentinel-proxy
+    restart: unless-stopped
+    ports:
+      - "80:80"
+      - "8080:80"
+    volumes:
+      - ./nginx/nginx.conf:/etc/nginx/nginx.conf:ro
+      - ./nginx/conf.d:/etc/nginx/conf.d:ro
+    depends_on:
+      aegis-app:
+        condition: service_healthy
+    networks:
+      - aegis-net
+
+volumes:
+  aegis-data:
+    name: aegis-sentinel-data
+
+networks:
+  aegis-net:
+    name: aegis-sentinel-network
+    driver: bridge
