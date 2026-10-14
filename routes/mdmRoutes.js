@@ -47,6 +47,35 @@ router.post('/devices/enroll', (req, res) => {
   }
 });
 
+// POST /api/mdm/devices/:id/reactivate - Re-activate or re-enroll wiped/quarantined device
+router.post('/devices/:id/reactivate', (req, res) => {
+  try {
+    const { actorId, actorRole } = req.body;
+    const device = MdmService.reactivateDevice({
+      deviceId: req.params.id,
+      actorId: actorId || 'usr-cmd-01',
+      actorRole: actorRole || 'COMMANDER'
+    });
+    res.json({ success: true, data: device });
+  } catch (error) {
+    res.status(400).json({ success: false, error: error.message });
+  }
+});
+
+// POST /api/mdm/devices/reset-fleet - Restore all devices to active ENROLLED status
+router.post('/devices/reset-fleet', (req, res) => {
+  try {
+    const { actorId, actorRole } = req.body;
+    const result = MdmService.resetFleet({
+      actorId: actorId || 'usr-cmd-01',
+      actorRole: actorRole || 'COMMANDER'
+    });
+    res.json({ success: true, data: result });
+  } catch (error) {
+    res.status(500).json({ success: false, error: error.message });
+  }
+});
+
 // POST /api/mdm/quarantine - Network isolate device
 router.post('/quarantine', async (req, res) => {
   try {

@@ -99,6 +99,12 @@ const API = {
   getCommandHistory() {
     return this.get('/api/mdm/commands');
   },
+  reactivateDevice(deviceId, actorId, actorRole) {
+    return this.post(`/api/mdm/devices/${deviceId}/reactivate`, { actorId, actorRole });
+  },
+  resetFleet(actorId, actorRole) {
+    return this.post('/api/mdm/devices/reset-fleet', { actorId, actorRole });
+  },
 
   // 4. Isolated Security Testing Lab
   getLabScenarios() {

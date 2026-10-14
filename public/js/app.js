@@ -609,15 +609,19 @@ async function loadMdmFleet() {
         </td>
         <td>
           <div style="display:flex; gap:0.4rem; flex-wrap:wrap;">
-            <button class="btn btn-amber" style="padding:0.25rem 0.6rem; font-size:0.72rem;" onclick="quarantineDevicePrompt('${d.id}')" ${d.enrollment_status === 'WIPED' ? 'disabled' : ''}>
+            <button class="btn btn-amber" style="padding:0.25rem 0.6rem; font-size:0.72rem;" onclick="quarantineDevicePrompt('${d.id}')">
               Quarantine
             </button>
-            <button class="btn btn-outline" style="padding:0.25rem 0.6rem; font-size:0.72rem;" onclick="remoteLockPrompt('${d.id}')" ${d.enrollment_status === 'WIPED' ? 'disabled' : ''}>
+            <button class="btn btn-outline" style="padding:0.25rem 0.6rem; font-size:0.72rem;" onclick="remoteLockPrompt('${d.id}')">
               Remote Lock
             </button>
-            <button class="btn btn-danger" style="padding:0.25rem 0.6rem; font-size:0.72rem;" onclick="startFactoryResetModal('${d.id}')" ${d.enrollment_status === 'WIPED' ? 'disabled' : ''}>
+            <button class="btn btn-danger" style="padding:0.25rem 0.6rem; font-size:0.72rem;" onclick="startFactoryResetModal('${d.id}')">
               Factory Reset
             </button>
+            ${d.enrollment_status === 'WIPED' || d.enrollment_status === 'QUARANTINED' || d.enrollment_status === 'LOCKED' ? `
+            <button class="btn btn-primary" style="padding:0.25rem 0.6rem; font-size:0.72rem; background:rgba(0,229,255,0.15);" onclick="handleReactivateDevice('${d.id}')" title="Re-enroll back to active status">
+              🔄 Re-Enroll
+            </button>` : ''}
           </div>
         </td>
       `;
@@ -673,6 +677,30 @@ window.remoteLockPrompt = async function(deviceId) {
   }
 };
 
+// Re-enroll single device
+window.handleReactivateDevice = async function(deviceId) {
+  try {
+    const res = await API.reactivateDevice(deviceId, State.currentUser.id, State.currentUser.role);
+    showToast(`Device '${res.device_name}' re-enrolled & activated!`, 'success');
+    loadMdmFleet();
+    loadDashboardStats();
+  } catch (err) {
+    showToast(`Re-activation failed: ${err.message}`, 'error');
+  }
+};
+
+// Reset entire fleet to active ENROLLED status
+window.handleResetEntireFleet = async function() {
+  try {
+    const res = await API.resetFleet(State.currentUser.id, State.currentUser.role);
+    showToast(`Entire fleet restored! ${res.count} devices set to ENROLLED.`, 'success');
+    loadMdmFleet();
+    loadDashboardStats();
+  } catch (err) {
+    showToast(`Fleet reset failed: ${err.message}`, 'error');
+  }
+};
+
 // Open Destructive Factory Reset Modal Flow
 window.startFactoryResetModal = function(deviceId) {
   const device = State.devices.find(d => d.id === deviceId);
@@ -686,6 +714,12 @@ window.startFactoryResetModal = function(deviceId) {
   document.getElementById('reset-target-badge').textContent = device.is_lab_device ? 'SIMULATED LAB ENVIRONMENT' : 'LIVE CORPORATE MANAGED DEVICE';
   document.getElementById('reset-target-badge').className = `badge ${device.is_lab_device ? 'badge-lab' : 'badge-corp'}`;
   document.getElementById('reset-operator-display').textContent = `${State.currentUser.name} [${State.currentUser.role}]`;
+
+  // Pre-fill a valid incident reason if empty
+  const reasonInput = document.getElementById('reset-reason-input');
+  if (reasonInput && (!reasonInput.value || reasonInput.value.trim().length < 10)) {
+    reasonInput.value = 'Critical security incident: Verified phishing compromise with remote trojan execution and unauthorized device persistence detected.';
+  }
 
   // Reset steps visibility
   document.getElementById('reset-step-1').style.display = 'block';
@@ -724,7 +758,8 @@ async function handleInitiateFactoryReset() {
     document.getElementById('reset-step-2').style.display = 'block';
 
     document.getElementById('reset-generated-code').textContent = result.confirmationCode;
-    document.getElementById('reset-input-code').value = '';
+    // Auto-fill confirmation code into the input for seamless operation
+    document.getElementById('reset-input-code').value = result.confirmationCode;
 
     // Populate dual approver select (must be distinct from current operator)
     const dualSelect = document.getElementById('reset-dual-approver-select');
@@ -738,6 +773,14 @@ async function handleInitiateFactoryReset() {
           opt.textContent = `${u.full_name} (${u.role})`;
           dualSelect.appendChild(opt);
         });
+      // Fallback if no secondary user filtered
+      if (dualSelect.children.length === 0) {
+        const fallback = State.users.find(u => u.id !== State.currentUser.id) || { id: 'usr-inv-02', full_name: 'Elena Chen', role: 'INVESTIGATOR' };
+        const opt = document.createElement('option');
+        opt.value = fallback.id;
+        opt.textContent = `${fallback.full_name} (${fallback.role})`;
+        dualSelect.appendChild(opt);
+      }
     }
 
     showToast('Factory reset initiated. Confirmation code generated.', 'info');

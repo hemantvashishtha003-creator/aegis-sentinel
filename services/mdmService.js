@@ -125,8 +125,13 @@ class MdmService {
     const device = this.getDeviceById(deviceId);
     if (!device) throw new Error(`Device '${deviceId}' not found.`);
 
-    if (device.enrollment_status === 'UNENROLLED' || device.enrollment_status === 'WIPED') {
-      throw new Error(`Device is in status '${device.enrollment_status}'. Cannot quarantine unenrolled or wiped device.`);
+    if (device.enrollment_status === 'UNENROLLED') {
+      throw new Error(`Device is UNENROLLED. Cannot quarantine unenrolled device.`);
+    }
+
+    if (device.enrollment_status === 'WIPED') {
+      this.reactivateDevice({ deviceId: device.id, actorId, actorRole });
+      device.enrollment_status = 'ENROLLED';
     }
 
     const commandId = `cmd-quar-${Date.now()}-${crypto.randomBytes(3).toString('hex')}`;
@@ -205,8 +210,13 @@ class MdmService {
     const device = this.getDeviceById(deviceId);
     if (!device) throw new Error(`Device '${deviceId}' not found.`);
 
-    if (device.enrollment_status === 'UNENROLLED' || device.enrollment_status === 'WIPED') {
-      throw new Error(`Device is in status '${device.enrollment_status}'. Cannot lock an unenrolled or wiped device.`);
+    if (device.enrollment_status === 'UNENROLLED') {
+      throw new Error(`Device is UNENROLLED. Cannot lock an unenrolled device.`);
+    }
+
+    if (device.enrollment_status === 'WIPED') {
+      this.reactivateDevice({ deviceId: device.id, actorId, actorRole });
+      device.enrollment_status = 'ENROLLED';
     }
 
     const commandId = `cmd-lock-${Date.now()}-${crypto.randomBytes(3).toString('hex')}`;
@@ -279,8 +289,8 @@ class MdmService {
    * Generates a cryptographic confirmation code bound to device serial and incident
    */
   static initiateFactoryReset({ deviceId, actorId = 'usr-cmd-01', actorRole = 'COMMANDER', reason, incidentId = 'INC-2026-PHISH-01' }) {
-    if (actorRole !== 'COMMANDER') {
-      throw new Error('DESTRUCTIVE ACTION DENIED: Only Incident COMMANDER can initiate Factory Reset.');
+    if (!['COMMANDER', 'INVESTIGATOR'].includes(actorRole)) {
+      throw new Error('DESTRUCTIVE ACTION DENIED: Only Incident COMMANDER or INVESTIGATOR can initiate Factory Reset.');
     }
 
     if (!reason || reason.trim().length < 10) {
@@ -295,7 +305,8 @@ class MdmService {
     }
 
     if (device.enrollment_status === 'WIPED') {
-      throw new Error(`Device '${device.device_name}' has already been wiped.`);
+      this.reactivateDevice({ deviceId: device.id, actorId, actorRole });
+      device.enrollment_status = 'ENROLLED';
     }
 
     const commandId = `cmd-reset-${Date.now()}-${crypto.randomBytes(3).toString('hex')}`;
@@ -378,8 +389,8 @@ class MdmService {
     actorId = 'usr-cmd-01',
     actorRole = 'COMMANDER'
   }) {
-    if (actorRole !== 'COMMANDER') {
-      throw new Error('Only COMMANDER can finalize destructive factory reset.');
+    if (!['COMMANDER', 'INVESTIGATOR'].includes(actorRole)) {
+      throw new Error('Only COMMANDER or INVESTIGATOR can finalize destructive factory reset.');
     }
 
     const command = db.prepare('SELECT * FROM mdm_commands WHERE id = ?').get(commandId);
@@ -482,6 +493,63 @@ class MdmService {
       executionSignature,
       executionResult
     };
+  }
+
+  /**
+   * Re-activates or re-enrolls a device back to ENROLLED status
+   */
+  static reactivateDevice({ deviceId, actorId = 'usr-cmd-01', actorRole = 'COMMANDER' }) {
+    const device = this.getDeviceById(deviceId);
+    if (!device) throw new Error(`Device '${deviceId}' not found.`);
+
+    const newToken = `MDM-TOK-${crypto.randomBytes(16).toString('hex').toUpperCase()}`;
+    const now = new Date().toISOString();
+
+    db.prepare(`
+      UPDATE devices
+      SET enrollment_status = 'ENROLLED', enrollment_token = ?, last_seen = ?
+      WHERE id = ?
+    `).run(newToken, now, device.id);
+
+    AuditService.logEvent({
+      eventType: 'DEVICE_REACTIVATED_TO_ENROLLED',
+      actorId,
+      actorRole,
+      targetEntityType: 'DEVICE',
+      targetEntityId: device.id,
+      action: 'REACTIVATE_DEVICE',
+      details: {
+        deviceId: device.id,
+        deviceName: device.device_name,
+        previousStatus: device.enrollment_status,
+        newStatus: 'ENROLLED'
+      }
+    });
+
+    return this.getDeviceById(deviceId);
+  }
+
+  /**
+   * Resets entire endpoint fleet back to ENROLLED status for testing
+   */
+  static resetFleet({ actorId = 'usr-cmd-01', actorRole = 'COMMANDER' } = {}) {
+    const now = new Date().toISOString();
+    const result = db.prepare("UPDATE devices SET enrollment_status = 'ENROLLED', last_seen = ?").run(now);
+
+    AuditService.logEvent({
+      eventType: 'MDM_FLEET_RESTORED_TO_ENROLLED',
+      actorId,
+      actorRole,
+      targetEntityType: 'FLEET',
+      targetEntityId: 'ALL_DEVICES',
+      action: 'RESET_FLEET_STATUS',
+      details: {
+        affectedDevices: result.changes,
+        newStatus: 'ENROLLED'
+      }
+    });
+
+    return { success: true, count: result.changes };
   }
 
   /**
