@@ -1,8 +1,11 @@
 {
-  "name": "security-gardddd",
+  "name": "aegis-sentinel",
   "version": "1.0.0",
-  "description": "",
-  "main": "index.js",
+  "description": "AEGIS-SENTINEL: Device Security & Incident Response Platform",
+  "main": "server.js",
+  "engines": {
+    "node": ">=22.x"
+  },
   "scripts": {
     "start": "node server.js",
     "test": "node --test --test-concurrency=1 tests/*.test.js"

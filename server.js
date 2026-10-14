@@ -19,8 +19,13 @@ app.use(cors());
 app.use(express.json({ limit: '10mb' }));
 app.use(express.urlencoded({ extended: true }));
 
-// Serve frontend static assets
-app.use(express.static(path.join(__dirname, 'public')));
+// Resolve frontend static assets directory
+const fs = require('fs');
+const publicDir = fs.existsSync(path.join(__dirname, 'public'))
+  ? path.join(__dirname, 'public')
+  : path.join(process.cwd(), 'public');
+
+app.use(express.static(publicDir));
 
 // Mount API routes
 app.use('/api/assessment', assessmentRoutes);
@@ -33,7 +38,7 @@ app.use('/api/stats', userRoutes); // Mount stats routes
 
 // Fallback to index.html for SPA navigation
 app.use((req, res) => {
-  res.sendFile(path.join(__dirname, 'public', 'index.html'));
+  res.sendFile(path.join(publicDir, 'index.html'));
 });
 
 // Global error handler

@@ -19,8 +19,24 @@ try {
 }
 
 function initDb() {
-  const schemaPath = path.join(__dirname, 'schema.sql');
-  const schemaSql = fs.readFileSync(schemaPath, 'utf8');
+  let schemaSql = '';
+  const candidatePaths = [
+    path.join(__dirname, 'schema.sql'),
+    path.join(process.cwd(), 'db', 'schema.sql'),
+    path.join(__dirname, '..', 'db', 'schema.sql')
+  ];
+
+  for (const p of candidatePaths) {
+    if (fs.existsSync(p)) {
+      schemaSql = fs.readFileSync(p, 'utf8');
+      break;
+    }
+  }
+
+  if (!schemaSql) {
+    throw new Error('Unable to locate db/schema.sql in any standard path.');
+  }
+
   db.exec(schemaSql);
   seedInitialData();
 }
