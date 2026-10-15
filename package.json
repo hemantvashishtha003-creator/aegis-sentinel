@@ -4,7 +4,7 @@
   "description": "AEGIS-SENTINEL: Device Security & Incident Response Platform",
   "main": "server.js",
   "engines": {
-    "node": ">=22.x"
+    "node": "22.x"
   },
   "scripts": {
     "start": "node server.js",
@@ -17,6 +17,7 @@
   "dependencies": {
     "cors": "^2.8.6",
     "express": "^5.3.0",
+    "sql.js": "^1.15.0",
     "uuid": "^14.0.3"
   }
 }
