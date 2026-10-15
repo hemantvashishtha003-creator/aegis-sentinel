@@ -1,5 +1,4 @@
 const crypto = require('crypto');
-const { v4: uuidv4 } = require('uuid');
 const db = require('../db');
 const config = require('../config');
 const AuditService = require('./auditService');
@@ -29,7 +28,7 @@ class MdmService {
     }
 
     const deviceId = `dev-${isLabDevice ? 'lab' : 'corp'}-${Date.now().toString().slice(-4)}-${crypto.randomBytes(2).toString('hex')}`;
-    const udid = uuidv4().toUpperCase();
+    const udid = crypto.randomUUID().toUpperCase();
     const enrollmentToken = `MDM-TOK-${crypto.randomBytes(16).toString('hex').toUpperCase()}`;
     const certFingerprint = 'SHA256:' + crypto.randomBytes(16).toString('hex').match(/.{1,2}/g).join(':').toUpperCase();
     const now = new Date().toISOString();
